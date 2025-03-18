@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Art Gallery</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js"
+            }
+        }
+    </script>
+    
+
+
+    <script type="module">
+        import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
+        import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/PointerLockControls.js";
+
+        console.log("Three.js Loaded:", THREE);
+
+        // Scene setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14213D); // Dark Blue Background
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 5); // Adjust height for a natural view
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 10, 5);
+scene.add(directionalLight);
+
+// Add Floor
+const floorGeometry = new THREE.PlaneGeometry(20, 20);
+const floorMaterial = new THREE.MeshStandardMaterial({ color: 0xE5E5E5 });
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
+
+// Create Walls
+const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x14213D, 
+    side: THREE.DoubleSide  }); // Dark Blue
+const wallGeometry = new THREE.PlaneGeometry(10, 5);
+
+// Left Wall
+const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
+leftWall.position.set(-5, 2.5, 0);
+leftWall.rotation.y = Math.PI / 2;
+scene.add(leftWall);
+
+// Right Wall
+const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
+rightWall.position.set(5, 2.5, 0);
+rightWall.rotation.y = -Math.PI / 2;
+scene.add(rightWall);
+
+// Function to Create Art Frames (Fixing Position)
+function createArtFrame(imageURL, position, rotationY) {
+    const frameGeometry = new THREE.PlaneGeometry(3, 2);
+    const texture = new THREE.TextureLoader().load(imageURL);
+    const frameMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+    frame.position.set(position.x, position.y, position.z);
+    frame.rotation.y = rotationY; // Correct alignment with the wall
+    scene.add(frame);
+}
+
+// Add Art Frames (Now Positioned Correctly)
+createArtFrame("textures/art1.jpg", { x: -4.8, y: 2.5, z: 0 }, Math.PI / 2); // Left Wall
+createArtFrame("textures/art2.jpg", { x: 4.8, y: 2.5, z: 0 }, -Math.PI / 2); // Right Wall
+
+
+// Add Art Frames on the Walls
+createArtFrame("textures/art1.jpg", { x: -4.9, y: 2.5, z: 0 }); // Left Wall
+createArtFrame("textures/art2.jpg", { x: 4.9, y: 2.5, z: 0 });  // Right Wall
+
+// Pointer Lock Controls
+const controls = new PointerLockControls(camera, document.body);
+
+document.addEventListener("click", () => {
+    controls.lock();
+});
+
+// Movement Controls
+const movement = { forward: false, backward: false, left: false, right: false };
+
+document.addEventListener("keydown", (event) => {
+    switch (event.code) {
+        case "KeyW": movement.forward = true; break;
+        case "KeyS": movement.backward = true; break;
+        case "KeyA": movement.left = true; break;
+        case "KeyD": movement.right = true; break;
+    }
+});
+
+document.addEventListener("keyup", (event) => {
+    switch (event.code) {
+        case "KeyW": movement.forward = false; break;
+        case "KeyS": movement.backward = false; break;
+        case "KeyA": movement.left = false; break;
+        case "KeyD": movement.right = false; break;
+    }
+});
+
+// Smooth Movement Update
+const speed = 0.1;
+function updateMovement() {
+    if (movement.forward) controls.moveForward(speed);
+    if (movement.backward) controls.moveForward(-speed);
+    if (movement.left) controls.moveRight(-speed);
+    if (movement.right) controls.moveRight(speed);
+}
+
+// Render Loop
+function animate() {
+    requestAnimationFrame(animate);
+    updateMovement();
+    renderer.render(scene, camera);
+}
+animate();
+
+// Handle Window Resize
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+    </script>
+
+</body>
+</html>

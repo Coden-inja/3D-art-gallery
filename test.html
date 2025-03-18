@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Three.js</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <script type="module">
+        import * as THREE from "three";
+        import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/PointerLockControls.js";
+
+        console.log("Three.js and PointerLockControls loaded successfully!");
+    </script>
+</body>
+</html>
